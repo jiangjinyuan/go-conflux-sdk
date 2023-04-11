@@ -114,10 +114,11 @@ func NewFromBase32(base32Str string) (cfxAddress Address, err error) {
 		return cfxAddress, errors.Wrapf(err, "failed to create body by %v", bodyStr)
 	}
 
-	_, hexAddress, err := cfxAddress.body.ToHexAddress()
+	versionByte, hexAddress, err := cfxAddress.body.ToHexAddress()
 	if err != nil {
 		return cfxAddress, errors.Wrapf(err, "failed to get hex address by body %v", cfxAddress.body)
 	}
+	fmt.Println(versionByte)
 
 	cfxAddress.addressType, err = CalcAddressType(hexAddress)
 	if err != nil {
@@ -182,6 +183,8 @@ func NewFromBytes(hexAddress []byte, networkID ...uint32) (val Address, err erro
 	if err != nil {
 		return val, errors.Wrapf(err, "failed to calculate version type of %x", hexAddress)
 	}
+
+	fmt.Println(versionByte.ToByte())
 
 	val.body, err = NewBodyByHexAddress(versionByte, hexAddress)
 	if err != nil {
@@ -320,6 +323,11 @@ func (a *Address) GetBody() Body {
 // GetChecksum returns checksum
 func (a *Address) GetChecksum() Checksum {
 	return a.getDefaultIfEmpty().checksum
+}
+
+// SetAddressType set address type
+func (a *Address) SetAddressType(t AddressType) {
+	a.addressType = t
 }
 
 // CompleteByClient will set networkID by client.GetNetworkID() if a.networkID not be 0
